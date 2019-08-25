@@ -32,7 +32,7 @@ mds.MDS.init(self, n_dims = 2, max_iter = 300, n_init = 4, x_init = None, verbos
 * n_dims: int; number of dimensions in embedding space
 * max_iter: int; maximum iterations of SMACOF algorithm to perform
 * n_init: int; number of times to initialize SMACOF algorithm with random uniform(0, 100) initialization
-* x_init: array; initial embedding. If not None, n_init is set to 1 and n_dims is set to x_init.shape[1]
+* x_init: array or None; initial embedding. If not None, n_init is set to 1 and n_dims is set to x_init.shape[1]
 * verbosity: int; if >= 1, print num iterations and final sigma values. if >= 2, print sigma value each iteration 
   (note: verbosity >= 2 slows performance by a factor of approximately 2)
     
@@ -43,8 +43,8 @@ mds.MDS.fit(self, delta, sqform = False)
 
 class MDS attributes: 
 
-* mds.MDS.x: array; embedding
-* mds.MDS.r2: float; R-squared value
+* mds.MDS.x: array or None; embedding
+* mds.MDS.r2: float or None; R-squared value
 
 Other functions from mds.py:
 
@@ -54,7 +54,7 @@ mds.mds_fit(delta, n_dims = 2, max_iter = 300, n_init = 4, x_init = None, verbos
 * n_dims: int; number of dimensions in embedding space
 * max_iter: int; maximum iterations of SMACOF algorithm to perform
 * n_init: int; number of times to initialize SMACOF algorithm with random uniform(0, 100) initialization
-* x_init: array; initial embedding. If not None, n_init is set to 1 and n_dims is set to x_init.shape[1]
+* x_init: array or None; initial embedding. If not None, n_init is set to 1 and n_dims is set to x_init.shape[1]
 * verbosity: int; if >= 1, print num iterations and final sigma values. if >= 2, print sigma value each iteration
   (note: verbosity >= 2 slows performance by a factor of approximately 2)
 * sqform: bool; if True, delta is interpreted in squareformn, if False, delta is interpreted in longform
@@ -66,5 +66,5 @@ minkowski.minkowski_pairs(X, p = 2, w = None, sqform = True)
 
 * X: array of shape (n_samples, n_features); matrix of samples
 * p: float; p for minkowski distance
-* w: array of shape (n_features, ); weights for minkowski distance
+* w: array of shape (n_features, ) or None; weights for minkowski distance
 * sqform: bool; if True, squareform matrix of pairwise distances is returned, otherwise, longform is returned
