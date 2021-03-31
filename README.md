@@ -1,9 +1,10 @@
-# MDS
+# MDScuda
 This is a cuda implementation of Multidimensional Scaling (https://en.wikipedia.org/wiki/Multidimensional_scaling) using the SMACOF algorithm. Currently only metric MDS is supported. 
 
-# Example:
+## Example:
 
-```
+```Python
+import numpy as np
 from mds import MDS, mds_fit
 from minkowski import minkowski_pairs
 
@@ -23,7 +24,7 @@ print("mds r2: {}".format(mds.r2)) #prints R-squared value to assess quality of 
 x = mds_fit(DELTA, n_dims = 3, verbosity = 1)
 ```
 
-# Documentation for mds.py:
+## Documentation for mds.py:
 
 class MDS methods:
 
@@ -60,7 +61,7 @@ mds.mds_fit(delta, n_dims = 2, max_iter = 300, n_init = 4, x_init = None, verbos
 * sqform: bool; if True, delta is interpreted in squareformn, if False, delta is interpreted in longform
 
                     
-# Documentation for minkowski.py:
+## Documentation for minkowski.py:
 
 minkowski.minkowski_pairs(X, p = 2, w = None, sqform = True)
 
