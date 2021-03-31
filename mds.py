@@ -207,16 +207,3 @@ class MDS: #sklearn style class
             delta = squareform(delta) # converts to longform for r2 calculation
         self.r2 = pearsonr(minkowski_pairs(self.x, sqform = False), delta)[0]**2
         return self.x
-
-# example:
-
-#N_SAMPLES = 10000
-#N_FEATURES = 1000
-#X = np.random.normal(size = (N_SAMPLES, N_FEATURES))
-#DELTA = minkowski_pairs(X, sqform = False)
-
-#mds = MDS(n_dims = 3, max_iter = 100, n_init = 1, verbosity = 2)
-#x = mds.fit(DELTA)
-#print("mds r2: {}".format(mds.r2))
-
-#x = mds_fit(DELTA, n_dims = 3, max_iter = 100, n_init = 1, verbosity = 1)
