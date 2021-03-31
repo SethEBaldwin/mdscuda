@@ -36,8 +36,3 @@ sklearn final sigma: 199902115.6507256
 
 mdscuda time:  3.107743078027852
 sklearn time:  97.7366347979987
-
-Test4
-
-mdscuda time:  0.2822071920381859
-sklearn time:  0.6233493809122592
