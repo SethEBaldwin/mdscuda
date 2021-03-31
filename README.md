@@ -1,5 +1,5 @@
 # mdscuda
-This is a cuda implementation of Multidimensional Scaling (https://en.wikipedia.org/wiki/Multidimensional_scaling) using the SMACOF algorithm. Currently only metric MDS is supported. 
+This is a CUDA implementation of Multidimensional Scaling (https://en.wikipedia.org/wiki/Multidimensional_scaling) using the SMACOF algorithm. Currently only metric MDS is supported. 
 
 ## Example:
 
