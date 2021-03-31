@@ -2,4 +2,5 @@ numpy
 scipy
 numba
 pandas
-sklearn
+scikit-learn
+plotly
