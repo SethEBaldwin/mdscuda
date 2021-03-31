@@ -19,6 +19,6 @@ print("mds r2: {}".format(mds.r2))
 print('mdscuda time: ', time.perf_counter() - tick)
 
 tick = time.perf_counter()
-embedding = sklearn_MDS(n_components = 3, max_iter=50, n_init = 1, verbose = 2)
+embedding = sklearn_MDS(n_components = 3, max_iter=50, n_init = 1, verbose = 1)
 X_transformed = embedding.fit_transform(X)
 print('sklearn time: ', time.perf_counter() - tick)

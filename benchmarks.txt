@@ -28,7 +28,7 @@ sklearn time: 4.266261733951978
 
 Test3
 
-Dataset: digits
+Dataset: Digits
 Dataset shape: (1797, 64)
 Parameters: n_components = 3, max_iter = 600, n_init = 3
 
