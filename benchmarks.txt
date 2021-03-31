@@ -1,3 +1,5 @@
+All times are in seconds
+
 Test1
 
 Dataset: np.random.normal
