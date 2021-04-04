@@ -1,6 +1,5 @@
 import numpy as np
-from mds import MDS, mds_fit
-from minkowski import minkowski_pairs
+from mdscuda import MDS, mds_fit, minkowski_pairs
 
 N_SAMPLES = 1000
 N_FEATURES = 100

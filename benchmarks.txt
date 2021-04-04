@@ -1,4 +1,5 @@
-All times are in seconds
+Run on AMD Ryzen 5 2600 CPU and Nvidia RTX 2080 Ti GPU.
+All times are in seconds.
 
 Test1
 

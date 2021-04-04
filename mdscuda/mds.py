@@ -1,7 +1,7 @@
 import numpy as np
 from numba import cuda
 import time
-from minkowski import minkowski_pairs
+from mdscuda.minkowski import minkowski_pairs
 from scipy.spatial.distance import squareform
 from scipy.stats.stats import pearsonr
 
@@ -128,18 +128,18 @@ def smacof(x, delta, max_iter, verbosity):
     x = x2.copy_to_host(stream = stream)
     return (x, sig, iter)
 
-def mds_fit(delta,          # matrix of pairwise distances of sample points 
+def mds_fit(delta,      # matrix of pairwise distances of sample points 
                         #   in feature space, in longform by default
     n_dims = 2,         # number of dimensions of embedding space
     max_iter = 300,     # max number of iterations in smacof algorithm
     n_init = 4,         # number of times to run smacof
     x_init = None,      # initial embedding
-                        #   if None, smacof is run on uniform(0,100) initialization
+                        #   if None, smacof is run on uniform(0, 100) initialization
                         #   if not None, n_init is set to 1
                         #   and n_dims is set to x_init.shape[1]
     verbosity = 0,      # if >= 1, print num iterations and final sigma values
                         #   if >= 2, print sigma value each iteration (slows performance)
-    sqform = False):    # if true, interpret delta as squareform
+    sqform = False):    # if True, interpret delta as squareform
 
     tick = time.perf_counter()
 
