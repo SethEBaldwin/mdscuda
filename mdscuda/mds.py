@@ -1,7 +1,7 @@
 import numpy as np
 from numba import cuda
 import time
-from minkowski import minkowski_pairs
+from mdscuda.minkowski import minkowski_pairs
 from scipy.spatial.distance import squareform
 from scipy.stats.stats import pearsonr
 from math import sqrt
