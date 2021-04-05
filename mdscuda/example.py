@@ -12,7 +12,7 @@ DELTA = minkowski_pairs(X, sqform = False)  # this returns a matrix of pairwise 
 
 # method 1: use an sklearn-style class
 
-mds = MDS(n_dims = 3, max_iter=50, n_init=1, verbosity = 2)  # defines sklearn-style class
+mds = MDS(n_dims = 3, max_iter=50, n_init=1, verbosity = 1)  # defines sklearn-style class
 x = mds.fit(DELTA)  # fits and returns embedding
 print('mds full runtime: {}'.format(time.perf_counter() - tick))
 print("mds r2: {}".format(mds.r2))  # prints R-squared value to assess quality of fit

@@ -85,10 +85,10 @@ def sum_iter_gpu(d, s):
 
 # TODO: copying d[0] to host is extremely slow! any way around this?
 def sigma(d, delta, blocks, tpb):
-    tick = time.perf_counter()
+    #tick = time.perf_counter()
     sigma_gpu[blocks, tpb](d, delta)
-    print('sigma diff', time.perf_counter() - tick)
-    tick = time.perf_counter()
+    #print('sigma diff', time.perf_counter() - tick)
+    #tick = time.perf_counter()
     s = 1
     while s < d.shape[0]:
         s *= 2
@@ -96,7 +96,7 @@ def sigma(d, delta, blocks, tpb):
     while s >= 1:
         sum_iter_gpu[int(s / tpb + 1), tpb](d, s)
         s = s // 2
-    print('sigma sum', time.perf_counter() - tick)
+    #print('sigma sum', time.perf_counter() - tick)
     return d[0]
     
 def smacof(x, delta, max_iter, verbosity):
@@ -117,23 +117,23 @@ def smacof(x, delta, max_iter, verbosity):
     
     for iter in range(max_iter):
         
-        if verbosity >= 2: #this overwrites d2
+        if verbosity >= 2:  # this overwrites d2
             euclidean_pairs_gpu[grid_dim, block_dim](x2, d2)
-            tick = time.perf_counter()
+            #tick = time.perf_counter()
             sig = sigma(d2, delta2, grids, tpb)
-            print('sig', time.perf_counter() - tick)
+            #print('sig', time.perf_counter() - tick)
             #todo: break condition.
             print("it: {}, sigma: {}".format(iter, sig))
         
-        tick = time.perf_counter()
+        #tick = time.perf_counter()
         euclidean_pairs_gpu[grid_dim, block_dim](x2, d2)
-        print('euc', time.perf_counter() - tick)
-        tick = time.perf_counter()
+        #print('euc', time.perf_counter() - tick)
+        #tick = time.perf_counter()
         b_gpu[grids, tpb](d2, delta2)
-        print('b', time.perf_counter() - tick)
-        tick = time.perf_counter()
+        #print('b', time.perf_counter() - tick)
+        #tick = time.perf_counter()
         x_gpu[grid_dim_x, block_dim](x2, d2)
-        print('bx', time.perf_counter() - tick)
+        #print('bx', time.perf_counter() - tick)
     
     euclidean_pairs_gpu[grid_dim, block_dim](x2, d2)
     sig = sigma(d2, delta2, grids, tpb)

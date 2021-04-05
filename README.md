@@ -86,7 +86,7 @@ Results:
 mdscuda final sigma: 11014284288.0
 sklearn final sigma: 11022683577.672052
 
-mdscuda time: 3.2328586309449747
+mdscuda time: 2.174905822990695
 sklearn time: 125.06202016805764
 
 Test2
@@ -99,8 +99,8 @@ Results:
 mdscuda final sigma: 120.9668197631836
 sklearn final sigma: 112.45789790236945
 
-mdscuda time: 2.1157941289711744
-sklearn time: 4.266261733951978
+mdscuda time: 3.961419030005345
+sklearn time: 3.922074425005121
 
 Test3
 
@@ -112,6 +112,6 @@ Results:
 mdscuda final sigma: 199908928.0
 sklearn final sigma: 199902115.6507256
 
-mdscuda time:  3.107743078027852
-sklearn time:  97.7366347979987
+mdscuda time:  2.1541129870165605
+sklearn time:  90.4121356800024
 ~~~
