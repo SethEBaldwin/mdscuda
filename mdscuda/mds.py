@@ -4,6 +4,7 @@ import time
 from minkowski import minkowski_pairs
 from scipy.spatial.distance import squareform
 from scipy.stats.stats import pearsonr
+from math import sqrt
 
 USE_64 = False
 
@@ -29,8 +30,9 @@ def euclidean_pairs_gpu(x, d):
     if i < j and j < n:
         tmp = 0
         for k in range(m):
-            tmp += (x[i, k] - x[j, k]) ** 2
-        d[idx(i, j, n)] = tmp ** (1 / 2)
+            diff = x[i, k] - x[j, k]
+            tmp += diff * diff
+        d[idx(i, j, n)] = sqrt(tmp)
 
 @cuda.jit("void(float{}[:], float{}[:])".format(bits, bits))
 def b_gpu(d, delta):
@@ -39,6 +41,7 @@ def b_gpu(d, delta):
         if d[i] != 0: 
             d[i] = -delta[i] / d[i]
 
+# TODO: tile?
 @cuda.jit("void(float{}[:, :], float{}[:])".format(bits, bits))
 def x_gpu(x, b):
     n = x.shape[0]
@@ -72,7 +75,7 @@ def sigma_gpu(d, delta):
     i = cuda.grid(1)
     if i < d.shape[0]:
         tmp = d[i] - delta[i]
-        d[i] = tmp ** 2
+        d[i] = tmp * tmp
     
 @cuda.jit("void(float{}[:], int32)".format(bits))
 def sum_iter_gpu(d, s):
@@ -80,8 +83,12 @@ def sum_iter_gpu(d, s):
     if i < s and i + s < d.shape[0]:
         d[i] += d[i + s]
 
+# TODO: copying d[0] to host is extremely slow! any way around this?
 def sigma(d, delta, blocks, tpb):
+    tick = time.perf_counter()
     sigma_gpu[blocks, tpb](d, delta)
+    print('sigma diff', time.perf_counter() - tick)
+    tick = time.perf_counter()
     s = 1
     while s < d.shape[0]:
         s *= 2
@@ -89,6 +96,7 @@ def sigma(d, delta, blocks, tpb):
     while s >= 1:
         sum_iter_gpu[int(s / tpb + 1), tpb](d, s)
         s = s // 2
+    print('sigma sum', time.perf_counter() - tick)
     return d[0]
     
 def smacof(x, delta, max_iter, verbosity):
@@ -111,13 +119,21 @@ def smacof(x, delta, max_iter, verbosity):
         
         if verbosity >= 2: #this overwrites d2
             euclidean_pairs_gpu[grid_dim, block_dim](x2, d2)
+            tick = time.perf_counter()
             sig = sigma(d2, delta2, grids, tpb)
+            print('sig', time.perf_counter() - tick)
             #todo: break condition.
             print("it: {}, sigma: {}".format(iter, sig))
         
+        tick = time.perf_counter()
         euclidean_pairs_gpu[grid_dim, block_dim](x2, d2)
+        print('euc', time.perf_counter() - tick)
+        tick = time.perf_counter()
         b_gpu[grids, tpb](d2, delta2)
+        print('b', time.perf_counter() - tick)
+        tick = time.perf_counter()
         x_gpu[grid_dim_x, block_dim](x2, d2)
+        print('bx', time.perf_counter() - tick)
     
     euclidean_pairs_gpu[grid_dim, block_dim](x2, d2)
     sig = sigma(d2, delta2, grids, tpb)
@@ -128,7 +144,10 @@ def smacof(x, delta, max_iter, verbosity):
     x = x2.copy_to_host(stream = stream)
     return (x, sig, iter)
 
-def mds_fit(delta,      # matrix of pairwise distances of sample points 
+# TODO: random state
+# TODO: early stopping
+def mds_fit(
+    delta,              # matrix of pairwise distances of sample points 
                         #   in feature space, in longform by default
     n_dims = 2,         # number of dimensions of embedding space
     max_iter = 300,     # max number of iterations in smacof algorithm
@@ -139,7 +158,8 @@ def mds_fit(delta,      # matrix of pairwise distances of sample points
                         #   and n_dims is set to x_init.shape[1]
     verbosity = 0,      # if >= 1, print num iterations and final sigma values
                         #   if >= 2, print sigma value each iteration (slows performance)
-    sqform = False):    # if True, interpret delta as squareform
+    sqform = False      # if True, interpret delta as squareform
+    ):
 
     tick = time.perf_counter()
 
@@ -184,7 +204,7 @@ def mds_fit(delta,      # matrix of pairwise distances of sample points
     
     return best[0]
 
-class MDS: #sklearn style class
+class MDS:  # sklearn style class
     
     def __init__(self, n_dims = 2, max_iter = 300, n_init = 4, x_init = None, verbosity = 0):
         self.n_dims = n_dims
@@ -194,16 +214,22 @@ class MDS: #sklearn style class
         self.verbosity = verbosity
         self.x = None
         self.r2 = None
+        self.delta = None
+        self.sigma = None
     
+    #TODO: record sigma
     def fit(self, delta, sqform = False):
-        self.x = mds_fit(delta, 
-                    n_dims = self.n_dims, 
-                    max_iter = self.max_iter, 
-                    n_init = self.n_init, 
-                    x_init = self.x_init, 
-                    verbosity = self.verbosity,
-                    sqform = sqform)
+        self.delta = delta
+        self.x = mds_fit(
+            self.delta, 
+            n_dims = self.n_dims, 
+            max_iter = self.max_iter, 
+            n_init = self.n_init, 
+            x_init = self.x_init, 
+            verbosity = self.verbosity,
+            sqform = sqform
+        )
         if sqform:
-            delta = squareform(delta) # converts to longform for r2 calculation
+            delta = squareform(delta)  # converts to longform for r2 calculation
         self.r2 = pearsonr(minkowski_pairs(self.x, sqform = False), delta)[0]**2
         return self.x
