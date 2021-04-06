@@ -5,7 +5,7 @@ This is a CUDA implementation of Multidimensional Scaling (https://en.wikipedia.
 
 pip install mdscuda
 
-Latest version: 0.1.2
+Latest version: 0.1.3
 
 ## Example
 
