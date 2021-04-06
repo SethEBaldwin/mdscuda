@@ -3,15 +3,8 @@ from numba import cuda
 from scipy.spatial.distance import squareform
 from math import sqrt
 
-USE_64 = False
+from mdscuda.utils import bits, np_type, idx, euclidean_pairs_gpu
 
-if USE_64:
-    bits = 64
-    np_type = np.float64
-else:
-    bits = 32
-    np_type = np.float32
-    
 @cuda.jit("void(float{}[:, :], float{}, float{}[:], float{}[:])".format(bits, bits, bits, bits))
 def distance_matrix_weighted_gpu(X, p, w, out):
     m = X.shape[0]
@@ -22,7 +15,7 @@ def distance_matrix_weighted_gpu(X, p, w, out):
         for k in range(n):
             tmp = X[i, k] - X[j, k]
             d += w[k] * abs(tmp) ** p
-        out[m * (m - 1) // 2 - (m - i) * (m - i - 1) // 2 + j - i - 1] = d ** (1/p)
+        out[idx(i, j, m)] = d ** (1/p)
 
 def dist_matrix_weighted(X, p, w):
     rows = X.shape[0]
@@ -49,20 +42,7 @@ def distance_matrix_gpu(X, p, out):
         for k in range(n):
             tmp = X[i, k] - X[j, k]
             d += abs(tmp) ** p
-        out[m * (m - 1) // 2 - (m - i) * (m - i - 1) // 2 + j - i - 1] = d ** (1/p)
-
-# give l2 its own function because this is slightly faster and will be used so often
-@cuda.jit("void(float{}[:, :], float{}[:])".format(bits, bits, bits))
-def distance_matrix_l2_gpu(X, out):
-    m = X.shape[0]
-    n = X.shape[1]
-    i, j = cuda.grid(2)
-    d = 0
-    if i < j and j < m:
-        for k in range(n):
-            tmp = X[i, k] - X[j, k]
-            d += tmp * tmp
-        out[m * (m - 1) // 2 - (m - i) * (m - i - 1) // 2 + j - i - 1] = sqrt(d)
+        out[idx(i, j, m)] = d ** (1/p)
 
 def dist_matrix(X, p):
     rows = X.shape[0]
@@ -74,7 +54,7 @@ def dist_matrix(X, p):
     X = cuda.to_device(np.asarray(X, dtype = np_type), stream = stream)
     out2 = cuda.device_array(rows * (rows - 1) // 2, dtype = np_type)
     if p == 2:
-        distance_matrix_l2_gpu[grid_dim, block_dim](X, out2)
+        euclidean_pairs_gpu[grid_dim, block_dim](X, out2)
     else:
         distance_matrix_gpu[grid_dim, block_dim](X, p, out2)
     out = out2.copy_to_host(stream = stream)
