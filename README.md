@@ -21,7 +21,7 @@ DELTA = minkowski_pairs(X, sqform = False)  # this returns a matrix of pairwise 
 # method 1: use an sklearn-style class
 
 mds = MDS(n_dims = 3, verbosity = 2)  # defines sklearn-style class
-x = mds.fit(DELTA)  # fits and returns embedding
+x = mds.fit(DELTA, calc_r2=True)  # fits and returns embedding
 print("mds r2: {}".format(mds.r2))  # prints R-squared value to assess quality of fit
 
 # method 2: you can fit directly without using a class
@@ -31,7 +31,7 @@ x = mds_fit(DELTA, n_dims = 3, verbosity = 1)
 
 ## Documentation
 
-class MDS methods:
+class mdscuda.MDS methods:
 
 mdscuda.MDS.init(self, n_dims = 2, max_iter = 300, n_init = 4, x_init = None, verbosity = 0)
 
@@ -42,15 +42,16 @@ mdscuda.MDS.init(self, n_dims = 2, max_iter = 300, n_init = 4, x_init = None, ve
 * verbosity: int; if >= 1, print num iterations and final sigma values. if >= 2, print sigma value each iteration 
   (note: verbosity >= 2 slows performance by a factor of approximately 2)
     
-mdscuda.MDS.fit(self, delta, sqform = False)
+mdscuda.MDS.fit(self, delta, sqform = False, calc_r2 = False)
 
 * delta: array; matrix of pairwise distances, longform by default, squareform if sqform == True
 * sqform: bool; if True, delta is interpreted in squareformn, if False, delta is interpreted in longform
+* calc_r2: bool; if True, calculates R-squared value and records it as the attribute MDS.r2
 
-class MDS attributes: 
+class mdscuda.MDS attributes: 
 
-* mds.MDS.x: array or None; embedding
-* mds.MDS.r2: float or None; R-squared value
+* MDS.x: array or None; embedding
+* MDS.r2: float or None; R-squared value
 
 mdscuda.mds_fit(delta, n_dims = 2, max_iter = 300, n_init = 4, x_init = None, verbosity = 0, sqform = False)
 
@@ -86,7 +87,7 @@ Results:
 mdscuda final sigma: 11014284288.0
 sklearn final sigma: 11022683577.672052
 
-mdscuda time: 2.174905822990695
+mdscuda time: 1.5030748590070289
 sklearn time: 125.06202016805764
 
 Test2

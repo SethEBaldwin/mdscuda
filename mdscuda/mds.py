@@ -192,7 +192,7 @@ class MDS:  # sklearn style class
         self.sigma = None #TODO
     
     #TODO: record sigma
-    def fit(self, delta, sqform = False):
+    def fit(self, delta, sqform = False, calc_r2 = False):
         self.delta = delta
         self.x = mds_fit(
             self.delta, 
@@ -203,7 +203,8 @@ class MDS:  # sklearn style class
             verbosity = self.verbosity,
             sqform = sqform
         )
-        #if sqform:
-        #    delta = squareform(delta)  # converts to longform for r2 calculation
-        #self.r2 = pearsonr(minkowski_pairs(self.x, sqform = False), delta)[0]**2
+        if calc_r2:
+            if sqform:
+                delta = squareform(delta)  # converts to longform for r2 calculation
+            self.r2 = pearsonr(minkowski_pairs(self.x, sqform = False), delta)[0]**2
         return self.x
