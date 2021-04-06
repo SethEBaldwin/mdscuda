@@ -55,9 +55,9 @@ def dist_matrix(X, p):
     X = cuda.to_device(np.asarray(X, dtype = np_type), stream = stream)
     out2 = cuda.device_array(rows * (rows - 1) // 2, dtype = np_type)
     if p == 2:
-        tick = time.perf_counter()
+        #tick = time.perf_counter()
         euclidean_pairs_gpu[grid_dim, block_dim](X, out2)
-        print('euc pairs gpu', time.perf_counter() - tick)
+        #print('euc pairs gpu', time.perf_counter() - tick)
     else:
         distance_matrix_gpu[grid_dim, block_dim](X, p, out2)
     out = out2.copy_to_host(stream = stream)
@@ -74,9 +74,9 @@ def dist_matrix_tiled(X, p):
     X = cuda.to_device(np.asarray(X, dtype = np_type), stream = stream)
     out2 = cuda.device_array(rows * (rows - 1) // 2, dtype = np_type)
     if p == 2:
-        tick = time.perf_counter()
+        #tick = time.perf_counter()
         euclidean_pairs_tiled_gpu[grid_dim, block_dim](X, out2)
-        print('euc pairs tiled gpu', time.perf_counter() - tick)
+        #print('euc pairs tiled gpu', time.perf_counter() - tick)
     else:
         distance_matrix_gpu[grid_dim, block_dim](X, p, out2)
     out = out2.copy_to_host(stream = stream)

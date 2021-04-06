@@ -99,15 +99,15 @@ def smacof(x, delta, max_iter, verbosity):
             #todo: break condition.
             print("it: {}, sigma: {}".format(iter, sig))
         
-        tick = time.perf_counter()
+        #tick = time.perf_counter()
         euclidean_pairs_gpu[grid_dim, block_dim](x2, d2)
-        print('euc', time.perf_counter() - tick)
-        tick = time.perf_counter()
+        #print('euc', time.perf_counter() - tick)
+        #tick = time.perf_counter()
         b_gpu[grids, tpb](d2, delta2)
-        print('b', time.perf_counter() - tick)
-        tick = time.perf_counter()
+        #print('b', time.perf_counter() - tick)
+        #tick = time.perf_counter()
         x_gpu[grid_dim_x, block_dim](x2, d2)
-        print('bx', time.perf_counter() - tick)
+        #print('bx', time.perf_counter() - tick)
     
     euclidean_pairs_gpu[grid_dim, block_dim](x2, d2)
     sig = sigma(d2, delta2, grids, tpb)
@@ -187,9 +187,9 @@ class MDS:  # sklearn style class
         self.x_init = x_init
         self.verbosity = verbosity
         self.x = None
-        self.r2 = None
+        self.r2 = None #TODO
         self.delta = None
-        self.sigma = None
+        self.sigma = None #TODO
     
     #TODO: record sigma
     def fit(self, delta, sqform = False):
@@ -203,7 +203,7 @@ class MDS:  # sklearn style class
             verbosity = self.verbosity,
             sqform = sqform
         )
-        if sqform:
-            delta = squareform(delta)  # converts to longform for r2 calculation
-        self.r2 = pearsonr(minkowski_pairs(self.x, sqform = False), delta)[0]**2
+        #if sqform:
+        #    delta = squareform(delta)  # converts to longform for r2 calculation
+        #self.r2 = pearsonr(minkowski_pairs(self.x, sqform = False), delta)[0]**2
         return self.x

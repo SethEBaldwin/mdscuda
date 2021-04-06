@@ -12,7 +12,7 @@ if USE_64:
 else:
     bits = 32
     np_type = np.float32
-    
+
 # idx function explanation:
 # Let A[:, :] be a symmetric matrix (squareform) of size n by n with zeros on the diagonal
 # Let L[:] be the longform of A. Then for i < j, we have A[i, j] = L[idx(i, j, n)]

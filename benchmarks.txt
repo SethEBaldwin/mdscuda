@@ -11,7 +11,7 @@ Results:
 mdscuda final sigma: 11014284288.0
 sklearn final sigma: 11022683577.672052
 
-mdscuda time: 2.174905822990695
+mdscuda time: 1.5030748590070289
 sklearn time: 125.06202016805764
 
 Test2
