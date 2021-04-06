@@ -1,7 +1,5 @@
 import numpy as np
 from mdscuda import MDS, mds_fit, minkowski_pairs
-# from mds import MDS, mds_fit
-# from minkowski import minkowski_pairs
 import time
 
 N_SAMPLES = 10000

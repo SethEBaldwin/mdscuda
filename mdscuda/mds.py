@@ -15,7 +15,7 @@ def b_gpu(d, delta):
         if d[i] != 0: 
             d[i] = -delta[i] / d[i]
 
-# TODO: tile?
+# TODO: tile
 @cuda.jit("void(float{}[:, :], float{}[:])".format(bits, bits))
 def x_gpu(x, b):
     n = x.shape[0]
@@ -99,15 +99,15 @@ def smacof(x, delta, max_iter, verbosity):
             #todo: break condition.
             print("it: {}, sigma: {}".format(iter, sig))
         
-        #tick = time.perf_counter()
+        tick = time.perf_counter()
         euclidean_pairs_gpu[grid_dim, block_dim](x2, d2)
-        #print('euc', time.perf_counter() - tick)
-        #tick = time.perf_counter()
+        print('euc', time.perf_counter() - tick)
+        tick = time.perf_counter()
         b_gpu[grids, tpb](d2, delta2)
-        #print('b', time.perf_counter() - tick)
-        #tick = time.perf_counter()
+        print('b', time.perf_counter() - tick)
+        tick = time.perf_counter()
         x_gpu[grid_dim_x, block_dim](x2, d2)
-        #print('bx', time.perf_counter() - tick)
+        print('bx', time.perf_counter() - tick)
     
     euclidean_pairs_gpu[grid_dim, block_dim](x2, d2)
     sig = sigma(d2, delta2, grids, tpb)
