@@ -30,9 +30,9 @@ def dist_matrix_weighted(X, p, w):
     """Calculate pairwise distance matrix using weighted Minkowski distance and returns in longform
 
     Args:
-        X (cuda device array): matrix with rows samples, columns features
+        X (np.ndarray): matrix with rows samples, columns features
         p (float): exponent in Minkowski distance
-        w ([type]): [description]
+        w (np.ndarray): 1d array of weights for Minkowski distance, shape (n_features, )
 
     Returns:
         [np.ndarray]: matrix of pairwise distances in longform
