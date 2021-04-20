@@ -10,14 +10,27 @@ from mdscuda.minkowski import minkowski_pairs
 
 @cuda.jit("void(float{}[:], float{}[:])".format(bits, bits))
 def b_gpu(d, delta):
+    """Calculates B matrix from SMACOF algorithm and overwrites d with B matrix. 
+    Diagonal entries are calculated in x_gpu function.
+
+    Args:
+        d (cuda device array): matrix of pairwise distances of current iteration of SMACOF algorithm in longform
+        delta (cuda device array): original distance matrix in longform
+    """
     i = cuda.grid(1)
     if i < d.shape[0]:
         if d[i] != 0: 
             d[i] = -delta[i] / d[i]
 
-# TODO: tile
 @cuda.jit("void(float{}[:, :], float{}[:])".format(bits, bits))
 def x_gpu(x, b):
+    """Computes matrix multiplication B*x and overwrites x with B*x/n where n is number of samples.
+    Diagonal entries of B matrix are computed within this function before matrix multiplication occurs.
+
+    Args:
+        x (cuda device array): embedding for current iteration of SMACOF algorithm
+        b (cuda device array): B matrix in longform (with no diagonal entries)
+    """
     n = x.shape[0]
     m = x.shape[1]
     i, j = cuda.grid(2)
@@ -46,6 +59,13 @@ def x_gpu(x, b):
         
 @cuda.jit("void(float{}[:], float{}[:])".format(bits, bits))
 def sigma_gpu(d, delta):
+    """Computes squares of pairwise differences of d and delta as a first step towards computing sigma.
+    Overwrites d with result.
+
+    Args:
+        d (cuda device array): distance matrix for current iteration of SMACOF algorithm in longform
+        delta (cuda device array): original distance matrix in longform
+    """
     i = cuda.grid(1)
     if i < d.shape[0]:
         tmp = d[i] - delta[i]
@@ -53,12 +73,29 @@ def sigma_gpu(d, delta):
     
 @cuda.jit("void(float{}[:], int32)".format(bits))
 def sum_iter_gpu(d, s):
+    """Performs one iteration of sum reduction on d with stride s.
+
+    Args:
+        d (cuda device array): array to be summed
+        s (int): stride
+    """
     i = cuda.grid(1)
     if i < s and i + s < d.shape[0]:
         d[i] += d[i + s]
 
 # TODO: copying d[0] to host is extremely slow! any way around this?
 def sigma(d, delta, blocks, tpb):
+    """Calculates and returns sigma
+
+    Args:
+        d (cuda device array): pairwise distance matrix for current iteration of SMACOF algorithm in longform
+        delta (cuda device array): original pairwise distance matrix in longform
+        blocks (int): number of blocks
+        tpb (int): threads per block
+
+    Returns:
+        float: sigma value
+    """
     #tick = time.perf_counter()
     sigma_gpu[blocks, tpb](d, delta)
     #print('sigma diff', time.perf_counter() - tick)
@@ -74,6 +111,17 @@ def sigma(d, delta, blocks, tpb):
     return d[0]
     
 def smacof(x, delta, max_iter, verbosity):
+    """Performs SMACOF algorithm
+
+    Args:
+        x (cuda device array): initial embedding matrix
+        delta (cuda device array): original pairwise distance matrix in longform
+        max_iter (int): max number of iterations of SMACOF algorithm
+        verbosity (int): 0 for silent, 1 to print sigma after every initialization , 2 to print sigma after every iteration (slows performance)
+
+    Returns:
+        [type]: [description]
+    """
     rows = x.shape[0]
     cols = x.shape[1]
 
