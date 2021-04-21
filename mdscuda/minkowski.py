@@ -4,7 +4,8 @@ from scipy.spatial.distance import squareform
 from math import sqrt
 import time
 
-from mdscuda.utils import bits, np_type, idx, euclidean_pairs_gpu, euclidean_pairs_tiled_gpu, matmul_gpu, matmul_tiled_gpu
+from mdscuda.utils import bits, np_type, idx, euclidean_pairs_gpu
+# euclidean_pairs_tiled_gpu, matmul_gpu, matmul_tiled_gpu
 
 @cuda.jit("void(float{}[:, :], float{}, float{}[:], float{}[:])".format(bits, bits, bits, bits))
 def distance_matrix_weighted_gpu(X, p, w, out):
