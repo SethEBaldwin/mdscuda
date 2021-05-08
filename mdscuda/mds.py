@@ -58,7 +58,7 @@ def x_gpu(x, b):
         x[i, j] = tmp / n
         
 @cuda.jit("void(float{}[:], float{}[:])".format(bits, bits))
-def sigma_gpu(d, delta):
+def squared_diff_gpu(d, delta):
     """Computes squares of pairwise differences of d and delta as a first step towards computing sigma.
     Overwrites d with result.
 
@@ -97,7 +97,7 @@ def sigma(d, delta, blocks, tpb):
         float: sigma value
     """
     #tick = time.perf_counter()
-    sigma_gpu[blocks, tpb](d, delta)
+    squared_diff_gpu[blocks, tpb](d, delta)
     #print('sigma diff', time.perf_counter() - tick)
     #tick = time.perf_counter()
     s = 1
